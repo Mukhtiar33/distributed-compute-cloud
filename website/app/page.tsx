@@ -31,14 +31,14 @@ export default function HomePage() {
         >
           Download Worker Agent (coming soon)
         </button>
-        <span
-          role="button"
-          aria-disabled="true"
+        <button
+          type="button"
+          disabled
           title="Not available yet — consumer upload arrives in a later phase"
           className="cursor-not-allowed rounded-lg border border-slate-700 px-6 py-3 font-medium text-slate-400"
         >
           Submit a Job (coming soon)
-        </span>
+        </button>
       </div>
 
       <p className="text-sm text-slate-600">

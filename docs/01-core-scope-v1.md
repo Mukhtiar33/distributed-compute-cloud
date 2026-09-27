@@ -149,10 +149,10 @@ Named explicitly so it isn't silently forgotten: true distributed training (grad
 **Decision: every job submission requires a minimal declarative manifest, alongside or inside the zip.**
 
 Minimum v1 manifest fields (to be formalized precisely in the Execution Environments document):
-- `job_type`: `single` | `sharded`
+- `job_type`: `single` | `parallel`
 - `environment`: declared framework/dependency identifier (keys into the environment registry)
 - `entrypoint`: what to execute
-- `shards` (if `job_type: sharded`): explicit shard definition, consumer-declared per Section 5
+- `inputs` (if `job_type: parallel`): input list; batch boundaries are chosen by the Control Plane
 - `expected_output`: minimal shape description, used for provider-side output validation (Section 2)
 
 Without this, the Control Plane has no basis for environment resolution, scheduling, or output validation — it's not optional metadata, it's the contract the rest of the pipeline is keyed off.

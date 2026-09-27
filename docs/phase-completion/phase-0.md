@@ -19,23 +19,24 @@ Foundations & Repo Skeleton."
 Verified locally in the build environment before packaging:
 - `control-plane`: `go vet ./...` clean, `go build ./cmd/control-plane` succeeds, `go test ./...` passes (2 tests: `TestComponentName`, `TestVersionNotEmpty`).
 - `worker-agent`: same checks, same result (own test names, same coverage).
-- `website`: `npm ci`, `npm run lint` (0 warnings/errors), `npm test` (3/3 Vitest tests pass), `npm run build` (static export succeeds, 4/4 pages generated).
+- `website`: `npm ci`, `npm run lint` (0 warnings/errors), `npm test` (3/3 Vitest tests pass), `npm run build` (production build succeeds, 4/4 pages generated).
 
 One real bug was caught and fixed during this verification: the landing
 page originally passed an `onClick` handler to a plain `<a>` tag inside a
 Next.js **Server Component**, which is invalid in the App Router (event
 handlers require a Client Component) and made the production build fail
 with a static-generation timeout. Fixed by replacing the interactive
-placeholder with a non-interactive `role="button" aria-disabled="true"`
-element — correct here since the button does nothing yet anyway; Phase 9
-will convert this to a real client-side control when it's wired to actual
-upload logic.
+placeholder with a native disabled `<button>`. This is the correct Phase 0
+behavior because the button does nothing yet; Phase 9 will convert it to a
+real client-side control when it is wired to actual upload logic.
 
 A second issue was caught and fixed: the initially pinned `next@14.2.5` has
 a known, published security vulnerability (flagged by `npm install`
-itself). Bumped to the latest patched 14.2.x release (`14.2.35`) before
-finalizing — per the standing engineering standards, a known vulnerability
-is never shipped even in a Phase 0 shell.
+itself). The website dependencies were subsequently updated to
+`next@15.5.26` and `eslint-config-next@15.5.26`; TypeScript was pinned to
+`5.4.5` for ESLint compatibility. The resulting clean install, lint, tests,
+and production build all pass. The remaining audit findings were reviewed
+and were not resolved with a forced major upgrade.
 
 **Exit criterion: "Website shell loads locally and (optionally) is deployed to a free static host for early visibility."**
 

@@ -18,8 +18,13 @@ describe("HomePage (Phase 0 shell)", () => {
     expect(button).toBeDisabled();
   });
 
-  it("renders a disabled Submit a Job placeholder link", () => {
+  it("renders a disabled Submit a Job placeholder button", () => {
     render(<HomePage />);
-    expect(screen.getByText(/submit a job/i)).toBeInTheDocument();
+
+    const button = screen.getByRole("button", {
+      name: /submit a job/i,
+    });
+
+    expect(button).toBeDisabled();
   });
 });
