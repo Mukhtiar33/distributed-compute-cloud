@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Document 17: "Lint + build check on every PR for each component (no
+# tests yet — nothing to test)." Phase 0 does add trivial unit tests for
+# the version packages and the website shell, so we run those too — running
+# them costs nothing and establishes the CI habit from day one rather than
+# bolting it on later.
+
+jobs:
+  control-plane:
+    name: control-plane (build, vet, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: control-plane
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          # No go.sum yet (stdlib-only modules in Phase 0) — caching keyed
+          # on go.sum is added once real dependencies exist (Phase 1+).
+          cache: false
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: go build -o bin/control-plane ./cmd/control-plane
+
+      - name: go test
+        run: go test -race -cover ./...
+
+  worker-agent:
+    name: worker-agent (build, vet, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker-agent
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: false
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: go build -o bin/worker-agent ./cmd/worker-agent
+
+      - name: go test
+        run: go test -race -cover ./...
+
+  website:
+    name: website (lint, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
